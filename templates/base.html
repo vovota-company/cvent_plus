@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Cvent Plus{% endblock %}</title>
+<script src="https://cdn.tailwindcss.com"></script><script src="https://unpkg.com/lucide@latest"></script>
+<script>tailwind.config={theme:{extend:{colors:{ink:'#111111',paper:'#F7F7F5',line:'#E8E8E5'}}}}</script>
+<style>body{background:#f7f7f5;color:#111} .sidebar-link{display:flex;align-items:center;gap:.75rem;padding:.7rem .85rem;border-radius:.8rem;color:#737373;font-size:.9rem;font-weight:500}.sidebar-link:hover,.sidebar-link.active{background:#111;color:#fff}.field{width:100%;border:1px solid #e5e5e5;border-radius:12px;padding:11px 13px;background:white;outline:none}.field:focus{border-color:#111;box-shadow:0 0 0 3px #11111112}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:12px;padding:10px 15px;background:#111;color:white;font-weight:600;font-size:.88rem}.btn:hover{background:#333}.btn-light{background:white;color:#111;border:1px solid #e5e5e5}.btn-light:hover{background:#f4f4f4}.card{background:white;border:1px solid #ececea;border-radius:18px}.muted{color:#858585}</style></head>
+<body>
+{% if user.is_authenticated %}
+<div class="min-h-screen lg:flex">
+<aside class="hidden lg:flex lg:w-64 lg:flex-col bg-white border-r border-line px-5 py-6 fixed inset-y-0">
+<a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-2 mb-10"><span class="w-10 h-10 bg-ink text-white rounded-xl grid place-items-center"><i data-lucide="building-2"></i></span><span><b class="text-lg tracking-tight">Cvent Plus</b><small class="block text-xs muted">Hall operations</small></span></a>
+<div class="text-[10px] font-bold uppercase tracking-[.18em] text-neutral-400 px-3 mb-2">Workspace</div>
+<a class="sidebar-link" href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard" class="w-4"></i> Overview</a>
+<a class="sidebar-link" href="{% url 'hall_owners' %}"><i data-lucide="landmark" class="w-4"></i> Hall owners</a>
+{% if user.role == 'admin' or user.is_superuser %}<a class="sidebar-link" href="{% url 'bookings' %}"><i data-lucide="calendar-check" class="w-4"></i> Bookings</a>{% endif %}
+{% if user.role == 'admin' or user.role == 'super_agent' or user.is_superuser %}<a class="sidebar-link" href="{% url 'agents' %}"><i data-lucide="users" class="w-4"></i> Team</a>{% endif %}
+<a class="sidebar-link" href="{% url 'history' %}"><i data-lucide="history" class="w-4"></i> Commission history</a>
+<div class="text-[10px] font-bold uppercase tracking-[.18em] text-neutral-400 px-3 mt-8 mb-2">Finance</div>
+<a class="sidebar-link" href="{% url 'payment_methods' %}"><i data-lucide="wallet-cards" class="w-4"></i> Payment methods</a>
+<a class="sidebar-link" href="{% url 'withdrawals' %}"><i data-lucide="arrow-down-to-line" class="w-4"></i> Withdrawals</a>
+{% if user.is_superuser %}<a class="sidebar-link" href="/django-admin/"><i data-lucide="shield-check" class="w-4"></i> System admin</a>{% endif %}
+<div class="mt-auto border-t border-line pt-4"><div class="flex items-center gap-3 px-2"><div class="w-9 h-9 rounded-full bg-neutral-100 grid place-items-center font-bold">{{ user.username|first|upper }}</div><div class="min-w-0 flex-1"><b class="text-sm block truncate">{{ user.get_full_name|default:user.username }}</b><small class="muted">{{ user.get_role_display|default:"Super admin" }}</small></div><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button title="Sign out"><i data-lucide="log-out" class="w-4"></i></button></form></div></div>
+</aside>
+<main class="lg:ml-64 flex-1 min-w-0"><header class="h-16 bg-white border-b border-line flex items-center justify-between px-5 lg:px-9"><div><span class="text-sm muted">Cvent Plus</span><span class="text-sm muted mx-2">/</span><span class="text-sm font-semibold">{% block page_label %}Workspace{% endblock %}</span></div><div class="flex items-center gap-3"><span class="text-xs bg-neutral-100 rounded-full px-3 py-1.5">{{ user.get_role_display|default:"Super admin" }}</span><div class="w-8 h-8 rounded-full bg-black text-white grid place-items-center text-xs font-bold">{{ user.username|first|upper }}</div></div></header>
+<div class="p-5 lg:p-9 max-w-7xl mx-auto">{% if messages %}{% for message in messages %}<div class="mb-3 rounded-xl px-4 py-3 text-sm {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-neutral-900 text-white{% endif %}">{{ message }}</div>{% endfor %}{% endif %}{% block content %}{% endblock %}</div></main></div>
+{% else %}{% block auth_content %}{% endblock %}{% endif %}
+<script>lucide.createIcons();document.querySelectorAll('.sidebar-link').forEach(a=>{if(a.getAttribute('href')===location.pathname)a.classList.add('active')})</script></body></html>
